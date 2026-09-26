@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0a1310"><title>SOVEREIGN — Industrial Workbench · SIH 26117</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><div class="mark">S</div><div><b>SOVEREIGN</b><small>INDUSTRIAL WORKBENCH · PROTOTYPE</small></div></div>
+    <button class="new-chat" id="newChat"><span>＋</span> New session</button>
+    <div class="rail-label">WORKSPACE</div>
+    <button class="rail-item active"><span class="rail-icon">OPS</span> Operations assistant</button>
+    <button class="rail-item" id="filesJump"><span class="rail-icon">DOC</span> Document register <span id="docCount" class="counter">0</span></button>
+    <button class="rail-item" id="deliveriesJump"><span class="rail-icon">OUT</span> Work products</button>
+    <div class="rail-label settings-label">INFERENCE ROUTING</div>
+    <div class="route-list">
+      <div class="route-row"><span class="route-dot blue"></span><span>Document analysis</span><small>LOCAL</small></div>
+      <div class="route-row"><span class="route-dot violet"></span><span>General reasoning</span><small>LOCAL</small></div>
+      <div class="route-row"><span class="route-dot mint"></span><span>Code assistance</span><small>LOCAL</small></div>
+      <div class="route-row"><span class="route-dot amber"></span><span>Image review</span><small>LOCAL</small></div>
+    </div>
+    <div class="side-bottom"><div class="privacy-chip"><span class="lock">●</span><div><b>HOST STATUS</b><small id="privacyText">Checking local model…</small></div><span class="pulse" id="privacyDot"></span></div><div class="build-tag">PROTOTYPE <span>·</span> SIH 26117</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">MRPL <span>/</span> Operations <span>/</span> <b>Workspace</b></div><div class="top-right"><div class="status-pill" id="modelStatus"><i></i><span>Checking model</span></div><button class="icon-button" id="settingsBtn" aria-label="Model settings">SET</button><button class="avatar identity-avatar" id="identityBtn" aria-label="Identity and device security" title="Identity and device security">ID</button></div></header>
+    <section class="stage" id="stage">
+      <div class="hero" id="hero">
+        <div class="eyebrow"><span class="eyeline"></span> LOCAL INFERENCE, NO EGRESS</div>
+        <h1>Ask your procedures.<br>Nothing leaves this machine.</h1>
+        <p class="hero-copy">Search approved documents, review technical files, calculate from supplied inputs, and prepare draft records — routed to a model running on this workstation, not a remote service.</p>
+        <div class="hero-stamp" aria-hidden="true"><div class="stamp-head"><span>TOPOLOGY</span><span>127.0.0.1</span></div><svg viewBox="0 0 240 150" role="presentation">
+          <rect x="10" y="56" width="56" height="34" fill="none" stroke="#3a4d44" stroke-width="1.2"/>
+          <text x="38" y="76" text-anchor="middle" font-size="7" fill="#93a49a" font-family="monospace">DEVICE</text>
+          <path d="M66 73h26" stroke="#e3a23d" stroke-width="1.4" fill="none"/>
+          <path d="M88 69l4 4-4 4" stroke="#e3a23d" stroke-width="1.4" fill="none"/>
+          <rect x="94" y="48" width="66" height="48" fill="none" stroke="#e3a23d" stroke-width="1.4"/>
+          <text x="127" y="69" text-anchor="middle" font-size="7" fill="#e3a23d" font-family="monospace">LOCAL</text>
+          <text x="127" y="79" text-anchor="middle" font-size="7" fill="#e3a23d" font-family="monospace">MODEL</text>
+          <path d="M160 73h26" stroke="#e3a23d" stroke-width="1.4" fill="none"/>
+          <path d="M182 69l4 4-4 4" stroke="#e3a23d" stroke-width="1.4" fill="none"/>
+          <rect x="188" y="56" width="42" height="34" fill="none" stroke="#3a4d44" stroke-width="1.2"/>
+          <text x="209" y="76" text-anchor="middle" font-size="7" fill="#93a49a" font-family="monospace">OUTPUT</text>
+          <path d="M127 96v13" stroke="#5f7167" stroke-width="1.1" stroke-dasharray="2 2"/>
+          <path d="M119 115l16 16M135 115l-16 16" stroke="#d9694a" stroke-width="1.4"/>
+          <text x="127" y="145" text-anchor="middle" font-size="6.5" fill="#d9694a" font-family="monospace" letter-spacing="0.5">NO EGRESS</text>
+          <circle cx="18" cy="38" r="2" fill="#6fcb6a"/>
+          <text x="25" y="41" font-size="6.5" fill="#6fcb6a" font-family="monospace">LOOPBACK ONLY</text>
+        </svg><div class="stamp-foot"><span>DOCUMENTS</span><i></i><span>TOOLS</span><i></i><span>OUTPUT</span></div></div>
+        <div class="capabilities"><div><span>SRC</span><b id="metricFiles">0</b><small>Sources indexed</small></div><div><span>MDL</span><b id="metricModels">0</b><small>Local models</small></div><div><span>OUT</span><b id="metricOutputs">0</b><small>Work products</small></div></div>
+        <div class="suggest-title">COMMON OPERATIONS <span>SELECT TO START</span></div>
+        <div class="suggestions"><button data-prompt="Search my local knowledge base and summarize the most relevant operating guidance. Cite each source section."><span>FIND</span><b>Find in procedures</b><small>Search indexed documents</small></button><button data-prompt="Draft an approval note based on the uploaded documents. Search local knowledge first; identify assumptions and missing evidence clearly."><span>DRAFT</span><b>Prepare an approval note</b><small>Create a Word draft</small></button><button data-prompt="Calculate 12.5% of 480000 and explain the calculation steps."><span>CALC</span><b>Calculate a value</b><small>Show expression and result</small></button></div>
+      </div>
+      <div class="conversation" id="conversation" hidden></div>
+    </section>
+    <footer class="composer-wrap"><div class="composer" id="composer"><textarea id="prompt" rows="1" placeholder="Ask about indexed records or enter a calculation…"></textarea><div class="composer-tools"><div class="left-tools"><button id="uploadBtn" class="tool-button"><span>＋</span> Add records</button><span class="privacy-note"><span>●</span> Local processing</span></div><button id="sendBtn" class="send-button" aria-label="Send">RUN</button></div><input id="fileInput" type="file" hidden multiple accept=".pdf,.docx,.xlsx,.txt,.md,.csv,.json,.log,.html,.png,.jpg,.jpeg,.webp"></div><div class="composer-caption">AI output is advisory. Confirm operating and safety decisions against approved procedures.</div></footer>
+    <div class="toast" id="toast"></div>
+  </main>
+  <aside class="context" id="context">
+    <div class="context-head"><div><small>WORKSPACE RECORDS</small><h2>Session register</h2></div><button class="icon-button" id="refreshBtn" title="Refresh">REF</button></div>
+    <div class="context-section"><div class="section-title">SOURCE DOCUMENTS <span id="indexedCount">0</span></div><div id="documents" class="document-list"><div class="empty-state">No records added to this session.</div></div></div>
+    <div class="context-section delivery-section"><div class="section-title">GENERATED FILES <span id="outputCount">0</span></div><div id="deliverables" class="document-list"><div class="empty-state">Draft Word notes and CSV files will appear here.</div></div></div>
+    <div class="context-section audit-section"><div class="section-title">LOCAL ACTIVITY <span>THIS HOST</span></div><div id="activity" class="activity-list"><div class="empty-state">Processing events will be recorded locally.</div></div></div>
+    <div class="context-footer"><span class="local-glyph">◉</span><span>Inference via loopback Ollama</span><span class="info">i</span></div>
+  </aside>
+</div>
+<dialog id="settingsDialog"><form method="dialog"><div class="dialog-head"><div><span class="eyebrow">LOCAL MODEL ROUTER</span><h2>Model configuration</h2></div><button class="icon-button">×</button></div><p>Assign local Ollama models to work types. Leave a field on auto to let the router choose from installed models.</p><div id="modelFields"></div><div class="model-health" id="modelHealth"></div><div class="dialog-actions"><button class="secondary" value="cancel">Close</button><button class="primary" id="saveSettings" value="save">Save routing</button></div></form></dialog>
+<dialog id="identityDialog"><form method="dialog"><div class="dialog-head"><div><span class="eyebrow">COMPANY IDENTITY · DEVICE KEY</span><h2>Identity &amp; device</h2></div><button class="icon-button">×</button></div><div class="identity-status"><span class="identity-indicator"></span><div><b id="idpStatus">Company identity provider not connected</b><small>Employee authentication must be verified by your company’s on-prem identity server.</small></div></div><p class="identity-copy">Keep only an opaque employee reference and minimum role claims on this workstation. Generate a unique browser key here; its private key is non-exportable and saved in this browser’s local key store. The company server must enroll the public key and verify a fresh signed challenge before recognizing the browser.</p><div class="device-card"><div class="device-label">THIS BROWSER</div><b id="deviceState">No device key enrolled</b><code id="deviceFingerprint">A device key helps recognize this browser; it does not prove who is using it.</code></div><div class="identity-actions"><button class="secondary" id="enrollDevice" type="button">Generate local device key</button><button class="secondary" id="forgetDevice" type="button" disabled>Remove key</button></div><p class="identity-note">Prototype status: key generation and local storage work in this browser. Company login, public-key registration, challenge verification, role sync, revocation, and server-side access enforcement require integration with the company identity provider. Device identity is not employee authentication.</p><div class="dialog-actions"><button class="secondary" value="cancel">Close</button></div></form></dialog>
+<script src="/app.js" defer></script>
+</body></html>

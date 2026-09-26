@@ -1,0 +1,8 @@
+{
+  "name": "sih26117-sovereign-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-first agentic AI workbench prototype for SIH26117",
+  "scripts": { "start": "node server.mjs" },
+  "engines": { "node": ">=20" }
+}
