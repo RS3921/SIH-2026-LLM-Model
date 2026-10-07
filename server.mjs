@@ -78,8 +78,7 @@ async function python(args, input) {
 async function extract(file) {
   const ext=path.extname(file.name).toLowerCase();
   if(['.png','.jpg','.jpeg','.webp'].includes(ext)) return `[Image file: ${file.name}. Inspect the attached image using vision.]`;
-  if(['.txt','.md','.csv','.json','.log','.html'].includes(ext)) return file.buffer.toString('utf8');
-  if(['.pdf','.docx','.xlsx'].includes(ext)) return await python(['extract',ext],file.buffer);
+  if(['.pdf','.docx','.xlsx','.txt','.md','.csv','.json','.log','.html'].includes(ext)) return await python(['extract',ext],file.buffer);
   throw Error('Supported files: PDF, DOCX, XLSX, TXT, Markdown, CSV, JSON, LOG.');
 }
 async function renderPdfPages(file) {
@@ -195,13 +194,14 @@ async function route(req,res) {
    const text=(await extract({name,buffer})).replace(/\u0000/g,' ').slice(0,2_000_000);
    if(!text.trim()&&!images.length)throw Error('No text or renderable pages found.');
    const sessionId=String(f.sessionId||''),chat=chats.get(sessionId);if(!chat)throw Error('Select or create a chat before uploading files.');
-   const id=crypto.randomUUID(),doc={id,name,sessionId,bytes:buffer.length,chunks:splitChunks(text),images,pageCount,scanned:ext==='.pdf'&&text.trim().length<80};
+   const id=crypto.randomUUID(),doc={id,name,sessionId,bytes:buffer.length,text,chunks:splitChunks(text),images,pageCount,scanned:ext==='.pdf'&&text.trim().length<80};
    documents.set(id,doc);await fs.writeFile(path.join(FILES,`${id}-${name}`),buffer);
    chat.documentIds=[...new Set([...chat.documentIds,id])];chat.updatedAt=Date.now();await persistChats();
    log('document.indexed',{name,chunks:doc.chunks.length,visualPages:images.length});
    return send(res,201,{id,name,characters:text.length,chunks:doc.chunks.length,visualPages:images.length,pageCount});
   }catch(e){return send(res,400,{error:e.message});}
  }
+ if(req.method==='GET'&&u.pathname.startsWith('/api/documents/')&&u.pathname.endsWith('/content')) {const id=decodeURIComponent(u.pathname.split('/').at(-2)),d=documents.get(id),sessionId=u.searchParams.get('sessionId');if(!d||d.sessionId!==sessionId)return send(res,404,{error:'Document not found in this chat.'});return send(res,200,{id:d.id,name:d.name,text:d.text||'',chunks:d.chunks.length,bytes:d.bytes,visualPages:d.images||[]});}
  if(req.method==='DELETE'&&u.pathname.startsWith('/api/documents/')) {const id=u.pathname.split('/').at(-1),d=documents.get(id);documents.delete(id);if(d)for(const f of await fs.readdir(FILES))if(f.startsWith(`${id}-`))await fs.rm(path.join(FILES,f),{force:true});let changed=false;for(const chat of chats.values()){const next=chat.documentIds.filter(documentId=>documentId!==id);if(next.length!==chat.documentIds.length){chat.documentIds=next;chat.updatedAt=Date.now();changed=true;}}if(changed)await persistChats();log('document.removed',{name:d?.name||id});return send(res,200,{ok:true});}
  if(req.method==='POST'&&u.pathname==='/api/chat') {let x;try{x=JSON.parse((await body(req,100000)).toString('utf8'));}catch{return send(res,400,{error:'Invalid JSON request.'});}if(!x.prompt?.trim())return send(res,400,{error:'Enter a request.'});const prompt=x.prompt.slice(0,12000),sessionId=String(x.sessionId||'').slice(0,100)||crypto.randomUUID();let chat=chats.get(sessionId);if(!chat)chat=newChatRecord(sessionId);if(chat.title==='New chat'&&!chat.messages.length)chat.title=prompt.replace(/\s+/g,' ').trim().slice(0,56)||'New chat';chat.messages.push({role:'user',content:prompt});chat.updatedAt=Date.now();await persistChats();try{return send(res,200,await agentTurn({prompt,sessionId,modelOverrides:x.modelOverrides||{}}));}catch(e){chat.messages.push({role:'assistant',content:'Request failed: '+e.message});chat.updatedAt=Date.now();await persistChats();log('agent.error',{message:e.message});return send(res,e.status||502,{error:e.message,details:e.details||null});}}
  if(req.method==='GET'&&u.pathname.startsWith('/api/download/')) {const name=safeName(decodeURIComponent(u.pathname.slice(14))),file=path.join(OUTPUTS,name);try{const bytes=await fs.readFile(file);return sendBuffer(res,200,bytes,{'content-type':name.endsWith('.docx')?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'text/csv; charset=utf-8','content-disposition':`attachment; filename="${name}"`});}catch{return send(res,404,{error:'Deliverable not found.'});}}
@@ -214,7 +214,7 @@ const orphanDocumentIds=[];
 for (const saved of await fs.readdir(FILES)) {
   if(saved.length<38||saved[36]!=='-')continue;
   const id=saved.slice(0,36), name=saved.slice(37);
-  try { const buffer=await fs.readFile(path.join(FILES,saved)), ext=path.extname(name).toLowerCase(); const isImage=['.png','.jpg','.jpeg','.webp'].includes(ext); const text=(await extract({name,buffer})).replace(/\u0000/g,' ').slice(0,2_000_000); let images=[],pageCount=0; if(isImage)images=[{page:1,image:buffer.toString('base64')}]; if(ext==='.pdf'){const rendered=await renderPdfPages({name,buffer});images=rendered.pages;pageCount=rendered.page_count;}const owner=[...chats.values()].find(chat=>chat.documentIds.includes(id));documents.set(id,{id,name,sessionId:owner?.id||null,bytes:buffer.length,chunks:splitChunks(text),images,pageCount,scanned:ext==='.pdf'&&text.trim().length<80});if(!owner)orphanDocumentIds.push(id); }
+  try { const buffer=await fs.readFile(path.join(FILES,saved)), ext=path.extname(name).toLowerCase(); const isImage=['.png','.jpg','.jpeg','.webp'].includes(ext); const text=(await extract({name,buffer})).replace(/\u0000/g,' ').slice(0,2_000_000); let images=[],pageCount=0; if(isImage)images=[{page:1,image:buffer.toString('base64')}]; if(ext==='.pdf'){const rendered=await renderPdfPages({name,buffer});images=rendered.pages;pageCount=rendered.page_count;}const owner=[...chats.values()].find(chat=>chat.documentIds.includes(id));documents.set(id,{id,name,sessionId:owner?.id||null,bytes:buffer.length,text,chunks:splitChunks(text),images,pageCount,scanned:ext==='.pdf'&&text.trim().length<80});if(!owner)orphanDocumentIds.push(id); }
   catch(e) { log('document.restore_failed',{name,message:e.message}); }
 }
 if(orphanDocumentIds.length){const chat=await createChat('Imported documents');chat.documentIds=orphanDocumentIds;for(const id of orphanDocumentIds){const doc=documents.get(id);if(doc)doc.sessionId=chat.id;}await persistChats();}
