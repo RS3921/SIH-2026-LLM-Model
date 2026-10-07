@@ -9,7 +9,9 @@
 <div class="shell">
   <aside class="rail">
     <div class="brand"><div class="mark">S</div><div><b>SOVEREIGN</b><small>INDUSTRIAL WORKBENCH · PROTOTYPE</small></div></div>
-    <button class="new-chat" id="newChat"><span>＋</span> New session</button>
+    <button class="new-chat" id="newChat"><span>＋</span> New chat</button>
+    <div class="rail-label chats-label">CHAT HISTORY</div>
+    <nav class="chat-list" id="chatList" aria-label="Saved chats"><div class="chat-empty">Loading saved chats…</div></nav>
     <div class="rail-label">WORKSPACE</div>
     <button class="rail-item active"><span class="rail-icon">OPS</span> Operations assistant</button>
     <button class="rail-item" id="filesJump"><span class="rail-icon">DOC</span> Document register <span id="docCount" class="counter">0</span></button>
@@ -58,8 +60,8 @@
     <div class="toast" id="toast"></div>
   </main>
   <aside class="context" id="context">
-    <div class="context-head"><div><small>WORKSPACE RECORDS</small><h2>Session register</h2></div><button class="icon-button" id="refreshBtn" title="Refresh">REF</button></div>
-    <div class="context-section"><div class="section-title">SOURCE DOCUMENTS <span id="indexedCount">0</span></div><div id="documents" class="document-list"><div class="empty-state">No records added to this session.</div></div></div>
+    <div class="context-head"><div><small>ACTIVE CHAT</small><h2>Chat workspace</h2></div><button class="icon-button" id="refreshBtn" title="Refresh">REF</button></div>
+    <div class="context-section"><div class="section-title">CHAT DOCUMENTS <span id="indexedCount">0</span></div><div id="documents" class="document-list"><div class="empty-state">No records added to this chat.</div></div></div>
     <div class="context-section delivery-section"><div class="section-title">GENERATED FILES <span id="outputCount">0</span></div><div id="deliverables" class="document-list"><div class="empty-state">Draft Word notes and CSV files will appear here.</div></div></div>
     <div class="context-section audit-section"><div class="section-title">LOCAL ACTIVITY <span>THIS HOST</span></div><div id="activity" class="activity-list"><div class="empty-state">Processing events will be recorded locally.</div></div></div>
     <div class="context-footer"><span class="local-glyph">◉</span><span>Inference via loopback Ollama</span><span class="info">i</span></div>
